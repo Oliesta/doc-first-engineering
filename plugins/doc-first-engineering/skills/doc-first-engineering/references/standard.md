@@ -2,6 +2,8 @@
 
 **Version 1.1** · **October 2026**
 
+**Author:** Olwethu Nguza, Technical Lead (ex-FAANG)
+
 *Humans, LLMs and the future of software work: principles, roles and documentation standards.*
 
 ---
@@ -956,4 +958,4 @@ One per environment, in `docs/operations/environments/<environment>.md`.
 
 *End of standard. Version 1.1.*
 
-*Doc-First Engineering Standard by Oliesta, https://github.com/Oliesta/doc-first-engineering, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).*
+*Doc-First Engineering Standard by Olwethu Nguza, https://github.com/Oliesta/doc-first-engineering, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).*

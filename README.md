@@ -4,6 +4,8 @@
 
 A standard, and a Claude skill that applies it, for building software when large language models write most of the code.
 
+By **Olwethu Nguza**, Technical Lead (ex-FAANG).
+
 Every layer of software has moved humans further from the machine: binary, assembly, programming languages, and now LLMs. Each layer below the LLM is deterministic. The LLM is not. So the durable human work moves up a layer, into documentation that defines intent, records decisions and makes correctness checkable.
 
 > We cannot see the future, but we can prepare for it.
@@ -83,6 +85,10 @@ Download [`dist/doc-first-engineering.zip`](dist/doc-first-engineering.zip), the
 **Adoption levels:** Documented, Decided, Doc-Led, Traceable, Source of Truth. Most teams reach Doc-Led quickly.
 
 Read the [full standard](plugins/doc-first-engineering/skills/doc-first-engineering/references/standard.md) or the [PDF](docs/Doc_First_Engineering_Standard_v1.1.pdf).
+
+## About the Author
+
+**Olwethu Nguza** is a Technical Lead and former FAANG engineer. The standard grew out of Olwethu's day-to-day workflow: architecture, decisions and rules are defined in documentation, LLMs write the code, and the docs and runbooks become the source of truth for review, debugging and incident response.
 
 ## Contributing
 
