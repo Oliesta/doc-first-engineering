@@ -15,8 +15,8 @@ Every layer of software has moved humans further from the machine: binary, assem
 | Path | What it is |
 |---|---|
 | [`plugins/doc-first-engineering/skills/doc-first-engineering/SKILL.md`](plugins/doc-first-engineering/skills/doc-first-engineering/SKILL.md) | The skill: how Claude applies the standard |
-| [`plugins/doc-first-engineering/skills/doc-first-engineering/references/standard.md`](plugins/doc-first-engineering/skills/doc-first-engineering/references/standard.md) | The full standard, Version 1.1 |
-| [`docs/Doc_First_Engineering_Standard_v1.1.pdf`](docs/Doc_First_Engineering_Standard_v1.1.pdf) | The standard as a phone-friendly PDF |
+| [`plugins/doc-first-engineering/skills/doc-first-engineering/references/standard.md`](plugins/doc-first-engineering/skills/doc-first-engineering/references/standard.md) | The full standard, Version 1.2 |
+| [`docs/Doc_First_Engineering_Standard_v1.2.pdf`](docs/Doc_First_Engineering_Standard_v1.2.pdf) | The standard as a phone-friendly PDF |
 | [`dist/doc-first-engineering.zip`](dist/doc-first-engineering.zip) | The skill packaged for upload to the Claude app |
 | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | Lets Claude Code install the skill as a plugin |
 
@@ -27,7 +27,7 @@ Once installed, Claude follows the standard whenever you:
 - **Change code or infrastructure.** Claude reads the relevant docs first and follows Define, Decide, Generate, Verify, Reconcile. Every change comes with a doc update or an explicit `No doc impact, because...`.
 - **Debug an environment.** Claude treats the runbook and environment guide as the source of truth and turns them into exact, read-only commands with explicit profile, region and context. It labels anything that changes state, asks rather than guessing resource names, and never runs commands against shared environments.
 - **Prepare for failure.** For a new component or decision, Claude offers a pre-mortem and drafts runbook failure mode entries before go-live.
-- **Write or review docs.** ADRs with review triggers, Rule IDs, repository-relative hyperlinks, a review checklist, and six templates: ADR, domain rules, change description, bug record, failure mode entry and environment guide.
+- **Write or review docs.** Accepted API docs that describe only the active contract, ADRs with review triggers, a decision register, Rule IDs, repository-relative hyperlinks, a review checklist, and six templates: ADR, domain rules, change description, bug record, failure mode entry and environment guide.
 
 ## Install
 
@@ -84,7 +84,7 @@ Download [`dist/doc-first-engineering.zip`](dist/doc-first-engineering.zip), the
 
 **Adoption levels:** Documented, Decided, Doc-Led, Traceable, Source of Truth. Most teams reach Doc-Led quickly.
 
-Read the [full standard](plugins/doc-first-engineering/skills/doc-first-engineering/references/standard.md) or the [PDF](docs/Doc_First_Engineering_Standard_v1.1.pdf).
+Read the [full standard](plugins/doc-first-engineering/skills/doc-first-engineering/references/standard.md) or the [PDF](docs/Doc_First_Engineering_Standard_v1.2.pdf).
 
 ## About the Author
 

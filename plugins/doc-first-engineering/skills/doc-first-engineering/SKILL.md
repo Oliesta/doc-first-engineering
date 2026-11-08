@@ -48,6 +48,17 @@ If code had to lead (incident, experiment), list the doc reconciliation as a fol
 - ADRs MUST link to affected docs, modules and environments. ADR numbers are never reused or renumbered. Accepted ADRs are not edited in substance; a changed decision gets a new superseding ADR. Keep each ADR to one decision.
 - When files move, update every link in the same change. A broken link is a defect.
 
+### Active contract only
+
+Once an API capability is implemented and accepted, its API documentation MUST describe the active contract only: endpoints, inputs, outputs, errors and rules. It MUST NOT contain implementation status, delivery history, transient test results or outstanding-work commentary. Move anything else to its home and link to it if useful:
+
+- Historical changes: `docs/CHANGELOG.md`.
+- Evidence (test runs, validation output, screenshots): `docs/operations/evidence/`.
+- Open decisions: `docs/architecture/decision-register.md`, with an owner and a due date; link the ADR once decided.
+- Delivery progress: the delivery tracker, such as Jira.
+
+When editing or reviewing accepted API docs, remove or relocate sentences with "currently", "not yet", "TODO", "in progress", "will be added", "as of", "was changed", "passed on", sprint names or ticket numbers.
+
 Traceability chain links should let a reader walk: Decision or Rule, Architecture doc, Implementation (domain or Terraform module), Environment configuration, Test or validation, Operations standard and Runbook.
 
 ## Debugging and incidents
@@ -95,7 +106,7 @@ Offer a pre-mortem: read the architecture docs and ADRs, list realistic failure 
 
 ## Reviewing a change
 
-Check: intent matches the updated docs and nothing more; docs updated or "no doc impact" justified; affected Rule IDs have tests; domain, layer and module boundaries respected; standards followed; links correct; environment impact confined to variables; no surprises (new dependencies, files outside the layout, unrequested code).
+Check: intent matches the updated docs and nothing more; docs updated or "no doc impact" justified; affected Rule IDs have tests; domain, layer and module boundaries respected; standards followed; links correct; environment impact confined to variables; accepted API docs hold only the active contract; no surprises (new dependencies, files outside the layout, unrequested code).
 
 Flag for a second human reviewer: authentication, authorisation, secrets, IAM, encryption, personal or regulated data, migrations, irreversible operations, financial or identity logic, concurrency, transactions, idempotency, networking, public exposure, production infrastructure.
 
@@ -106,6 +117,7 @@ docs/
   README.md  CHANGELOG.md
   context/overview.md  context/glossary.md
   architecture/architecture.md  infrastructure.md  security.md
+  architecture/decision-register.md
   architecture/decision-records/ADR-NNN-<title>.md
   domains/<domain>/rules.md  acceptance.md
   api/specification.md  openapi.yaml
@@ -113,6 +125,7 @@ docs/
   standards/coding.md  infrastructure.md  testing.md
   operations/operations-standard.md  runbook.md
   operations/environments/<env>.md
+  operations/evidence/
   operations/incidents/
   archive/
 infrastructure/

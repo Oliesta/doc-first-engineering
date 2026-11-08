@@ -1,7 +1,7 @@
 {
   "name": "doc-first-engineering",
   "displayName": "Doc-First Engineering",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Apply the Doc-First Engineering Standard when changing code or Terraform, writing ADRs, rules or runbooks, reviewing changes, or debugging an environment from its docs.",
   "author": {
     "name": "Olwethu Nguza",

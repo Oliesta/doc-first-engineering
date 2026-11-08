@@ -1,6 +1,6 @@
 # Doc-First Engineering Standard
 
-**Version 1.1** · **October 2026**
+**Version 1.2** · **November 2026**
 
 **Author:** Olwethu Nguza, Technical Lead (ex-FAANG)
 
@@ -14,6 +14,7 @@
 |---|---|---|
 | 0.1 | September 2026 | Initial draft. |
 | 1.1 | October 2026 | Consolidated. Adds infrastructure layout and Terraform rules, hyperlinking, proactive runbooks, environment guides and two new templates. Aligns normative language and removes duplicated rules. |
+| 1.2 | November 2026 | Accepted API documentation describes only the active contract. Adds the decision register and operations evidence, and says where history, evidence, open decisions and delivery progress belong. |
 
 ---
 
@@ -200,8 +201,9 @@ Every system SHOULD maintain the following documents. Small systems MAY merge th
 | Architecture | System shape, domains, boundaries, integrations, data flow | Architect | Structural changes |
 | Infrastructure Architecture | Cloud topology, networking, environments, one section per capability | Architect / Platform Owner | Infrastructure changes |
 | ADRs | One record per significant decision | Architect / Decision Maker | Any real choice between alternatives |
+| Decision Register | Open decisions, each with an owner and a due date, linked to its ADR once decided | Architect | When a question is raised or decided |
 | Domain Rules | Invariants, business rules, edge cases, acceptance criteria | Domain Owner | Any behaviour change |
-| Contracts | API specifications and data schemas | Domain Owner | Any interface change |
+| Contracts | The active API contract and data schemas, with no status or history (Section 9) | Domain Owner | Any interface change |
 | Coding Standards | Layering, naming, errors, logging, security conventions | Architect | Convention changes |
 | Infrastructure Standards | Terraform conventions, module design, tagging, naming | Platform Owner | Convention changes |
 | Testing Expectations | What "done" means per domain and per module | Domain Owner / Tester | New rules, domains or modules |
@@ -209,6 +211,7 @@ Every system SHOULD maintain the following documents. Small systems MAY merge th
 | Operations Standard | What must be true in operation: severity levels, on-call, change windows. Links to runbooks for procedures | Operator | Process changes |
 | Environment Guides | One per environment: accounts, regions, profiles, contexts, resource names | Operator / Platform Owner | Any environment change |
 | Runbook | Known failure modes, procedures, diagnostic commands | Operator | Before go-live, after incidents and near misses |
+| Operations Evidence | Test runs, validation output, screenshots and other proof, dated and linked from where they are cited | Operator / Tester | When evidence is produced |
 | Changelog | What changed, when, and which documents it touched | Everyone | Every change |
 
 The Operations Standard says **what** must happen. The Runbook says **how**. Environment Guides hold the **facts** both depend on.
@@ -231,6 +234,7 @@ Documentation lives in the same repository as code and infrastructure, is versio
 │   │   ├── architecture.md
 │   │   ├── infrastructure.md
 │   │   ├── security.md
+│   │   ├── decision-register.md
 │   │   └── decision-records/
 │   │       └── ADR-001-<title>.md
 │   ├── domains/
@@ -251,6 +255,7 @@ Documentation lives in the same repository as code and infrastructure, is versio
 │   │   ├── runbook.md
 │   │   ├── environments/
 │   │   │   └── <environment>.md
+│   │   ├── evidence/
 │   │   └── incidents/
 │   └── archive/
 ├── infrastructure/
@@ -339,6 +344,10 @@ Architecture Decision Records (ADRs) make reasoning recoverable, not just outcom
 - Infrastructure ADRs MUST link to the affected Terraform modules and environments.
 - An ADR SHOULD fit on a few phone screens. If it is longer, it probably holds more than one decision.
 
+### Open Decisions
+
+A question that has not been decided yet goes in the decision register (`docs/architecture/decision-register.md`) with an owner and a due date, not in the documents it affects. When it is decided, the entry links to the new ADR and is closed.
+
 > **Why the review trigger matters.** It makes a decision conditional rather than permanent. Before proposing a change that contradicts an ADR, a human or LLM checks whether its trigger has fired.
 
 ---
@@ -364,7 +373,7 @@ Documentation has two readers. What helps an LLM generate correct code also help
 - Vague words such as fast, secure, appropriate and as needed. Replace them with numbers or conditions.
 - Restating a rule in several places (P9).
 - Implementation detail the LLM should decide, unless it is a genuine constraint.
-- Narrative history in active documents. History belongs in ADRs, the changelog or the archive.
+- Narrative history, status or progress in active documents. See Active Documentation Describes the Current Contract, below.
 - Local file-system paths or line numbers.
 
 ### Example
@@ -386,6 +395,51 @@ create a new record.
 A repeated key with a different request body
 MUST be rejected with a conflict error.
 ```
+
+### Active Documentation Describes the Current Contract
+
+Once an API capability is implemented and accepted, its API documentation MUST describe the active contract. It MUST NOT contain implementation status, delivery history, transient test results or outstanding-work commentary.
+
+A reader, human or LLM, treats every sentence in a contract as a promise. Status and history read as promises that may no longer be true, and they go stale the moment the work moves on.
+
+Everything else has its own home:
+
+| Content | Belongs In |
+|---|---|
+| Historical changes | Changelog (`docs/CHANGELOG.md`) |
+| Evidence: test runs, validation output, screenshots | Operations evidence (`docs/operations/evidence/`) |
+| Open decisions | Decision register (`docs/architecture/decision-register.md`) |
+| Delivery progress | Delivery tracker, such as Jira |
+
+The API documentation MAY link to these. It MUST NOT restate them (P9).
+
+Signs that a sentence does not belong in an accepted contract: "currently", "not yet", "TODO", "in progress", "will be added", "as of", "was changed", "passed on", sprint names and ticket numbers.
+
+**Weak**
+
+```text
+POST /api/v1/orders
+Implemented in Sprint 14.
+Idempotency added after QA found
+duplicate orders.
+Tested 3 Nov: 47 of 47 passing.
+TODO: rate limiting still outstanding.
+```
+
+**Strong**
+
+```text
+POST /api/v1/orders
+Requires the Idempotency-Key header.
+
+A repeated key with the same body
+MUST return the original 201 response.
+
+A repeated key with a different body
+MUST return 409 Conflict.
+```
+
+The sprint goes to the delivery tracker, the QA finding to the changelog, the test run to operations evidence, and rate limiting to the decision register until someone decides it.
 
 ---
 
@@ -636,6 +690,7 @@ Generated code and infrastructure are reviewed as if written by a capable, fast 
 - **Standards.** Naming, error handling, logging, Terraform conventions.
 - **Traceability.** Are links present, correct and updated?
 - **Environment impact.** Which environments change, and is the change confined to variables where it should be?
+- **Active contract.** Accepted API documentation holds no status, history, test results or outstanding work.
 - **Surprises.** New dependencies, files outside the expected layout, or anything nobody asked for.
 
 ### Second Human Review
@@ -717,6 +772,10 @@ Teams adopt this standard in stages. Each level builds on the previous one.
 
 **Acceptance Criteria.** Conditions a change must meet to be considered done.
 
+**Active Contract.** What an accepted API promises today: endpoints, inputs, outputs, errors and rules. Nothing about how or when it was built.
+
+**Decision Register.** The list of open decisions, each with an owner and a due date. A decided entry links to its ADR.
+
 **Doc-First.** Documentation is updated before or with code, and is the source of truth.
 
 **Drift.** Documentation and implementation no longer describe the same behaviour.
@@ -732,6 +791,8 @@ Teams adopt this standard in stages. Each level builds on the previous one.
 **Invariant.** A rule that must always hold, such as "audit events are never modified".
 
 **Near Miss.** Something that almost failed, or failed without visible impact. Recorded like an incident.
+
+**Operations Evidence.** Dated proof such as test runs, validation output and screenshots, kept under `docs/operations/evidence/`.
 
 **Pre-mortem.** Asking, before go-live, how a component could fail, so the runbook is ready in advance.
 
@@ -956,6 +1017,6 @@ One per environment, in `docs/operations/environments/<environment>.md`.
 
 ---
 
-*End of standard. Version 1.1.*
+*End of standard. Version 1.2.*
 
 *Doc-First Engineering Standard by Olwethu Nguza, https://github.com/Oliesta/doc-first-engineering, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).*
