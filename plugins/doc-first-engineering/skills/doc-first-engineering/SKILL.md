@@ -48,6 +48,8 @@ If code had to lead (incident, experiment), list the doc reconciliation as a fol
 - ADRs MUST link to affected docs, modules and environments. ADR numbers are never reused or renumbered. Accepted ADRs are not edited in substance; a changed decision gets a new superseding ADR. Keep each ADR to one decision.
 - When files move, update every link in the same change. A broken link is a defect.
 
+Traceability chain links should let a reader walk: Decision or Rule, Architecture doc, Implementation (domain or Terraform module), Environment configuration, Test or validation, Operations standard and Runbook.
+
 ### Active contract only
 
 Once an API capability is implemented and accepted, its API documentation MUST describe the active contract only: endpoints, inputs, outputs, errors and rules. It MUST NOT contain implementation status, delivery history, transient test results or outstanding-work commentary. Move anything else to its home and link to it if useful:
@@ -58,8 +60,6 @@ Once an API capability is implemented and accepted, its API documentation MUST d
 - Delivery progress: the delivery tracker, such as Jira.
 
 When editing or reviewing accepted API docs, remove or relocate sentences with "currently", "not yet", "TODO", "in progress", "will be added", "as of", "was changed", "passed on", sprint names or ticket numbers.
-
-Traceability chain links should let a reader walk: Decision or Rule, Architecture doc, Implementation (domain or Terraform module), Environment configuration, Test or validation, Operations standard and Runbook.
 
 ## Debugging and incidents
 
