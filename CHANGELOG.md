@@ -1,5 +1,9 @@
 # Changelog
 
+## Website (November 2026)
+
+- The standard is published as a website at https://oliesta.github.io/doc-first-engineering/, built from the Markdown by `scripts/build-site.py`, with a sitemap and search metadata.
+
 ## 1.2.0 (November 2026)
 
 - Standard Version 1.2: once an API capability is implemented and accepted, its API documentation describes only the active contract, with no implementation status, delivery history, transient test results or outstanding-work commentary.

@@ -6,6 +6,8 @@ A standard, and a Claude skill that applies it, for building software when large
 
 By **Olwethu Nguza**, Technical Lead (ex-FAANG).
 
+**Read it online:** [oliesta.github.io/doc-first-engineering](https://oliesta.github.io/doc-first-engineering/)
+
 Every layer of software has moved humans further from the machine: binary, assembly, programming languages, and now LLMs. Each layer below the LLM is deterministic. The LLM is not. So the durable human work moves up a layer, into documentation that defines intent, records decisions and makes correctness checkable.
 
 > We cannot see the future, but we can prepare for it.
@@ -16,6 +18,7 @@ Every layer of software has moved humans further from the machine: binary, assem
 |---|---|
 | [`plugins/doc-first-engineering/skills/doc-first-engineering/SKILL.md`](plugins/doc-first-engineering/skills/doc-first-engineering/SKILL.md) | The skill: how Claude applies the standard |
 | [`plugins/doc-first-engineering/skills/doc-first-engineering/references/standard.md`](plugins/doc-first-engineering/skills/doc-first-engineering/references/standard.md) | The full standard, Version 1.2 |
+| [`docs/index.html`](docs/index.html) | The standard as a website, served by GitHub Pages and built from the Markdown |
 | [`docs/Doc_First_Engineering_Standard_v1.2.pdf`](docs/Doc_First_Engineering_Standard_v1.2.pdf) | The standard as a phone-friendly PDF |
 | [`dist/doc-first-engineering.zip`](dist/doc-first-engineering.zip) | The skill packaged for upload to the Claude app |
 | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) | Lets Claude Code install the skill as a plugin |
@@ -96,6 +99,7 @@ Issues and pull requests are welcome. This repository follows its own standard:
 
 - Change the standard first, then the skill.
 - Describe each change with the Change Description template (Appendix C of the standard).
+- After changing the standard, run `python3 scripts/build-site.py` to rebuild the website.
 - After changing the skill, run `scripts/build-skill-zip.sh` and update [`CHANGELOG.md`](CHANGELOG.md).
 
 ## License

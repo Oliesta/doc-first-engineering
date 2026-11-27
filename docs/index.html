@@ -1,0 +1,1346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doc-First Engineering Standard | Olwethu Nguza</title>
+<meta name="description" content="The Doc-First Engineering Standard: when LLMs write the code, documentation becomes the source of truth. Principles, roles, ADRs, runbooks, traceability and templates, plus a Claude skill that applies them. By Olwethu Nguza.">
+<meta name="author" content="Olwethu Nguza">
+<link rel="canonical" href="https://oliesta.github.io/doc-first-engineering/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Doc-First Engineering Standard">
+<meta property="og:description" content="The Doc-First Engineering Standard: when LLMs write the code, documentation becomes the source of truth. Principles, roles, ADRs, runbooks, traceability and templates, plus a Claude skill that applies them. By Olwethu Nguza.">
+<meta property="og:url" content="https://oliesta.github.io/doc-first-engineering/">
+<meta property="og:site_name" content="Doc-First Engineering">
+<meta property="article:author" content="Olwethu Nguza">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Doc-First Engineering Standard">
+<meta name="twitter:description" content="The Doc-First Engineering Standard: when LLMs write the code, documentation becomes the source of truth. Principles, roles, ADRs, runbooks, traceability and templates, plus a Claude skill that applies them. By Olwethu Nguza.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232F5BEA'/%3E%3Crect x='7' y='8' width='18' height='3' rx='1.5' fill='white'/%3E%3Crect x='7' y='14.5' width='14' height='3' rx='1.5' fill='white' opacity='.8'/%3E%3Crect x='7' y='21' width='10' height='3' rx='1.5' fill='white' opacity='.6'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Doc-First Engineering Standard", "alternativeHeadline": "Humans, LLMs and the future of software work: principles, roles and documentation standards.", "description": "The Doc-First Engineering Standard: when LLMs write the code, documentation becomes the source of truth. Principles, roles, ADRs, runbooks, traceability and templates, plus a Claude skill that applies them. By Olwethu Nguza.", "version": "1.2", "datePublished": "2026-10-21", "dateModified": "2026-11-27", "inLanguage": "en", "url": "https://oliesta.github.io/doc-first-engineering/", "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Olwethu Nguza", "jobTitle": "Technical Lead", "url": "https://github.com/Oliesta"}, "isBasedOn": "https://github.com/Oliesta/doc-first-engineering", "keywords": "doc-first engineering, documentation as source of truth, LLM software development, AI-assisted development, architecture decision records, ADR, runbooks, docs as code, spec-driven development, Claude skill, Claude Code plugin"}</script>
+<style>
+:root {
+  --bg: #ffffff; --bg-soft: #f5f7fb; --ink: #1b1f2a; --muted: #5b6475; --line: #dde2ec;
+  --accent: #2f5bea; --accent-soft: #eef2fd; --code-bg: #f4f5f8; --warn-bg: #fff6e5; --warn-line: #e8a33d;
+  --hero: #1b1f2a; --hero-ink: #ffffff; --hero-muted: #c9d0de;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12151c; --bg-soft: #181c25; --ink: #e6e9f0; --muted: #9aa3b5; --line: #2a303d;
+    --accent: #7b9bff; --accent-soft: #1c2440; --code-bg: #1a1e28; --warn-bg: #2a2214; --warn-line: #c8872a;
+    --hero: #0c0f15; --hero-ink: #ffffff; --hero-muted: #aab3c5;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 16px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.hero { background: var(--hero); color: var(--hero-ink); border-top: 6px solid #2f5bea; }
+.hero-inner { max-width: 1120px; margin: 0 auto; padding: 56px 20px 48px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+@media (min-width: 880px) { .hero-inner { grid-template-columns: 1.4fr 1fr; align-items: end; padding: 80px 32px 64px; } }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #8fa8ff; margin: 0 0 12px; }
+.hero h1 { font-size: clamp(36px, 6vw, 56px); line-height: 1.05; margin: 0 0 16px; letter-spacing: -.02em; }
+.hero .tag { font-size: 19px; color: var(--hero-muted); margin: 0 0 24px; max-width: 34em; }
+.byline { margin: 0 0 28px; }
+.byline strong { display: block; font-size: 17px; }
+.byline span { color: var(--hero-muted); font-size: 15px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-block; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px;
+  text-decoration: none; border: 1px solid #3a4256; color: #fff; }
+.btn.primary { background: #2f5bea; border-color: #2f5bea; }
+.btn:hover { filter: brightness(1.12); }
+.ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ladder li { background: #2a3142; color: #fff; font-size: 13px; padding: 6px 12px; border-radius: 5px; }
+.ladder li:first-child { background: #2f5bea; font-weight: 700; }
+.ladder li:nth-child(2) { font-weight: 700; }
+.ladder li:nth-child(1) { width: 100%; } .ladder li:nth-child(2) { width: 90%; }
+.ladder li:nth-child(3) { width: 80%; } .ladder li:nth-child(4) { width: 70%; }
+.ladder li:nth-child(5) { width: 60%; } .ladder li:nth-child(6) { width: 50%; }
+.ladder-cap { font-size: 13px; color: var(--hero-muted); margin: 10px 0 0; }
+
+.glance { background: var(--bg-soft); border-bottom: 1px solid var(--line); }
+.glance-inner { max-width: 1120px; margin: 0 auto; padding: 32px 20px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (min-width: 880px) { .glance-inner { grid-template-columns: repeat(3, 1fr); padding: 40px 32px; } }
+.glance h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); margin: 0 0 6px; }
+.glance p { margin: 0; font-size: 16px; }
+.glance-inner > div { min-width: 0; }
+.install pre { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.layout { max-width: 1120px; margin: 0 auto; padding: 0 20px 80px; }
+@media (min-width: 1000px) { .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 56px; padding: 0 32px 96px; } }
+nav.toc { padding: 24px 0 8px; }
+@media (min-width: 1000px) { nav.toc { position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto; padding: 40px 0; } }
+nav.toc details > summary { cursor: pointer; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); list-style: none; }
+nav.toc details > summary::-webkit-details-marker { display: none; }
+nav.toc ol { list-style: none; margin: 12px 0 0; padding: 0; }
+nav.toc a { display: flex; gap: 10px; padding: 5px 0; font-size: 14.5px; line-height: 1.35; color: var(--ink); text-decoration: none; }
+nav.toc a:hover { color: var(--accent); }
+nav.toc .num { flex: 0 0 22px; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+main { min-width: 0; max-width: 46rem; padding-top: 8px; }
+main h2 { font-size: clamp(26px, 3.4vw, 32px); line-height: 1.2; margin: 72px 0 16px; letter-spacing: -.01em; }
+main h2 .kicker { display: block; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+main h3 { font-size: 20px; margin: 36px 0 10px; }
+main h2:first-child { margin-top: 40px; }
+main p, main li { max-width: 42rem; }
+main ul, main ol { padding-left: 1.3em; }
+main li { margin: 4px 0; }
+main code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font-size: .88em; overflow-wrap: anywhere; }
+main pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.5; }
+main pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.table-wrap { overflow-x: auto; margin: 16px 0 24px; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 1.45; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 700; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+blockquote { margin: 20px 0; padding: 14px 18px; background: var(--accent-soft); border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0; }
+blockquote p { margin: 0; }
+blockquote p + p { margin-top: 8px; }
+blockquote.warn { background: var(--warn-bg); border-left-color: var(--warn-line); }
+blockquote.motto { background: var(--hero); border-left-color: #2f5bea; color: #fff; padding: 22px 24px; }
+blockquote.motto p { font-size: 24px; font-weight: 700; line-height: 1.3; }
+
+footer { border-top: 1px solid var(--line); background: var(--bg-soft); }
+.footer-inner { max-width: 1120px; margin: 0 auto; padding: 28px 20px; font-size: 14.5px; color: var(--muted); display: grid; gap: 6px; }
+@media (min-width: 1000px) { .footer-inner { padding: 32px; } }
+.footer-inner p { margin: 0; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <p class="eyebrow">Standard · Version 1.2 · November 2026</p>
+      <h1>Doc-First Engineering</h1>
+      <p class="tag">Documentation is the source of truth. LLMs write the code. Humans own the decisions.</p>
+      <p class="byline"><strong>Olwethu Nguza</strong><span>Technical Lead (ex-FAANG)</span></p>
+      <div class="actions">
+        <a class="btn primary" href="#section-01-purpose-and-scope">Read the standard</a>
+        <a class="btn" href="#install">Install the Claude skill</a>
+        <a class="btn" href="Doc_First_Engineering_Standard_v1.2.pdf">PDF</a>
+        <a class="btn" href="https://github.com/Oliesta/doc-first-engineering">GitHub</a>
+      </div>
+    </div>
+    <div>
+      <ol class="ladder" aria-label="The abstraction ladder, from highest to lowest">
+        <li>Human</li><li>Documentation</li><li>LLM</li><li>Programming language</li><li>Assembly</li><li>Binary</li>
+      </ol>
+      <p class="ladder-cap">Every layer below the LLM is deterministic. The LLM is not, so the durable human work moves up into documentation.</p>
+    </div>
+  </div>
+</header>
+
+<section class="glance" aria-label="At a glance">
+  <div class="glance-inner">
+    <div>
+      <h2>The thesis</h2>
+      <p>Code becomes a derived artifact. Documentation becomes the source. Engineers define intent, record decisions and judge results.</p>
+    </div>
+    <div>
+      <h2>The motto</h2>
+      <p>We cannot see the future, but we can prepare for it. Runbooks are written before the incident, and the LLM turns them into exact commands during it.</p>
+    </div>
+    <div class="install" id="install">
+      <h2>Install the skill</h2>
+      <p>In Claude Code:</p>
+<pre><code>/plugin marketplace add Oliesta/doc-first-engineering
+/plugin install doc-first-engineering@doc-first-engineering</code></pre>
+      <p style="margin-top:8px;font-size:14.5px">Claude app: upload <a href="https://github.com/Oliesta/doc-first-engineering/raw/main/dist/doc-first-engineering.zip">the skill zip</a> in your skills settings.</p>
+    </div>
+  </div>
+</section>
+
+<div class="layout">
+  <nav class="toc" aria-label="Contents">
+    <details open>
+      <summary>Contents</summary>
+      <ol>
+<li><a href="#version-history"><span class="num"></span>Version History</a></li>
+<li><a href="#section-01-purpose-and-scope"><span class="num">01</span>Purpose and Scope</a></li>
+<li><a href="#section-02-the-abstraction-ladder"><span class="num">02</span>The Abstraction Ladder</a></li>
+<li><a href="#section-03-core-thesis"><span class="num">03</span>Core Thesis</a></li>
+<li><a href="#section-04-roles-and-responsibilities"><span class="num">04</span>Roles and Responsibilities</a></li>
+<li><a href="#section-05-principles"><span class="num">05</span>Principles</a></li>
+<li><a href="#section-06-the-documentation-set"><span class="num">06</span>The Documentation Set</a></li>
+<li><a href="#section-07-repository-layout"><span class="num">07</span>Repository Layout</a></li>
+<li><a href="#section-08-adr-standard"><span class="num">08</span>ADR Standard</a></li>
+<li><a href="#section-09-writing-for-humans-and-llms"><span class="num">09</span>Writing for Humans and LLMs</a></li>
+<li><a href="#section-10-hyperlinking-and-traceability"><span class="num">10</span>Hyperlinking and Traceability</a></li>
+<li><a href="#section-11-the-change-lifecycle"><span class="num">11</span>The Change Lifecycle</a></li>
+<li><a href="#section-12-bugs-and-root-cause"><span class="num">12</span>Bugs and Root Cause</a></li>
+<li><a href="#section-13-runbooks-and-proactive-operations"><span class="num">13</span>Runbooks and Proactive Operations</a></li>
+<li><a href="#section-14-review-standard"><span class="num">14</span>Review Standard</a></li>
+<li><a href="#section-15-the-human-skill-shift"><span class="num">15</span>The Human Skill Shift</a></li>
+<li><a href="#section-16-risks-and-limits"><span class="num">16</span>Risks and Limits</a></li>
+<li><a href="#section-17-adoption-levels"><span class="num">17</span>Adoption Levels</a></li>
+<li><a href="#section-18-glossary"><span class="num">18</span>Glossary</a></li>
+<li><a href="#appendix-a-adr-template"><span class="num">A</span>ADR Template</a></li>
+<li><a href="#appendix-b-domain-rules-template"><span class="num">B</span>Domain Rules Template</a></li>
+<li><a href="#appendix-c-change-description-template"><span class="num">C</span>Change Description Template</a></li>
+<li><a href="#appendix-d-bug-record-template"><span class="num">D</span>Bug Record Template</a></li>
+<li><a href="#appendix-e-failure-mode-entry-template"><span class="num">E</span>Failure Mode Entry Template</a></li>
+<li><a href="#appendix-f-environment-guide-template"><span class="num">F</span>Environment Guide Template</a></li>
+      </ol>
+    </details>
+  </nav>
+  <main>
+<h2 id="version-history">Version History</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Version</th>
+<th>Date</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.1</td>
+<td>September 2026</td>
+<td>Initial draft.</td>
+</tr>
+<tr class="even">
+<td>1.1</td>
+<td>October 2026</td>
+<td>Consolidated. Adds infrastructure layout and Terraform rules, hyperlinking, proactive runbooks, environment guides and two new templates. Aligns normative language and removes duplicated rules.</td>
+</tr>
+<tr class="odd">
+<td>1.2</td>
+<td>November 2026</td>
+<td>Accepted API documentation describes only the active contract. Adds the decision register and operations evidence, and says where history, evidence, open decisions and delivery progress belong.</td>
+</tr>
+</tbody>
+</table></div>
+
+<h2 id="section-01-purpose-and-scope"><span class="kicker">Section 01</span>Purpose and Scope</h2>
+<p>This standard defines how software is built when Large Language Models (LLMs) write most of the code. It sets out what humans own, what LLMs own, and how documentation becomes the primary artifact that engineers create, review and maintain.</p>
+<h3 id="applies-to">Applies To</h3>
+<ul>
+<li>New systems designed with LLM-generated implementation from the start.</li>
+<li>Existing systems moving towards documentation-led development.</li>
+<li>Application code and infrastructure as code alike.</li>
+<li>Engineers, architects, testers, product teams and operations teams.</li>
+</ul>
+<h3 id="does-not-cover">Does Not Cover</h3>
+<ul>
+<li>Selection of LLM vendors or tools.</li>
+<li>Automated enforcement such as CI/CD gates. This standard relies on human discipline and review. Automation MAY be added later without changing the principles.</li>
+<li>Model training or fine-tuning.</li>
+</ul>
+<h3 id="standards-language">Standards Language</h3>
+<ul>
+<li><strong>MUST</strong> means mandatory.</li>
+<li><strong>MUST NOT</strong> means prohibited.</li>
+<li><strong>SHOULD</strong> means expected unless there is a documented reason not to.</li>
+<li><strong>MAY</strong> means optional.</li>
+</ul>
+<p>These words are written in capitals wherever they carry this meaning.</p>
+
+<h2 id="section-02-the-abstraction-ladder"><span class="kicker">Section 02</span>The Abstraction Ladder</h2>
+<p>Every major shift in software has moved humans one layer further from the machine. Each layer lets people express more intent with less detail.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Layer</th>
+<th>What Humans Write</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Binary</td>
+<td>Machine instructions as raw bits</td>
+</tr>
+<tr class="even">
+<td>Assembly</td>
+<td>Named instructions and registers</td>
+</tr>
+<tr class="odd">
+<td>Programming Language</td>
+<td>Logic, data structures and abstractions</td>
+</tr>
+<tr class="even">
+<td>LLM</td>
+<td>Prompts that produce code</td>
+</tr>
+<tr class="odd">
+<td>Documentation</td>
+<td>Durable intent: architecture, decisions, rules and acceptance criteria</td>
+</tr>
+<tr class="even">
+<td>Human</td>
+<td>Judgment about what should be built and whether it is correct</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="what-is-different-this-time">What Is Different This Time</h3>
+<p>Every layer below the LLM is deterministic. A compiler turns identical source code into identical output. An LLM does not. The same documentation may produce several different, equally plausible implementations.</p>
+<blockquote>
+<p><strong>Consequence.</strong> Because generation is non-deterministic, verification becomes a first-class engineering activity. Documentation defines what is correct. Tests and review confirm it.</p>
+</blockquote>
+<h3 id="documentation-is-not-a-prompt">Documentation Is Not a Prompt</h3>
+<p>A prompt is disposable and conversational. Documentation is versioned, reviewed, structured and owned, in the same way source code always has been.</p>
+
+<h2 id="section-03-core-thesis"><span class="kicker">Section 03</span>Core Thesis</h2>
+<blockquote>
+<p><strong>Code becomes a derived artifact. Documentation becomes the source.</strong> Human engineering work moves up a layer, to defining intent, making decisions and judging results.</p>
+</blockquote>
+<h3 id="claim-1-documentation-is-the-source-of-truth">Claim 1: Documentation Is the Source of Truth</h3>
+<p>When code and documentation disagree, documentation is assumed correct until a human decides otherwise. The disagreement itself is a defect, and it MUST be resolved in one direction or the other.</p>
+<h3 id="claim-2-the-mapping-is-layered-not-line-by-line">Claim 2: The Mapping Is Layered, Not Line by Line</h3>
+<p>A strict one-to-one mapping between every line of code and every line of documentation is neither possible nor useful. Natural language underspecifies, and many programs satisfy one description. The mapping that works is:</p>
+<pre class="text"><code>Decision / Rule
+       ↕
+Implementation
+       ↕
+Test or Validation</code></pre>
+<p>Every decision and rule has a home in the implementation (a domain module or a Terraform module) and a way to confirm it. Detail below that level belongs to the LLM and is judged by behaviour, not wording. Section 10 sets out the full navigation chain.</p>
+<h3 id="claim-3-reasoning-must-survive">Claim 3: Reasoning Must Survive</h3>
+<p>Code shows what a system does. Only documentation shows why. When code is regenerated or refactored, the reasoning MUST remain intact, because it is what lets the next person, or the next model, make a consistent change.</p>
+
+<h2 id="section-04-roles-and-responsibilities"><span class="kicker">Section 04</span>Roles and Responsibilities</h2>
+<p><strong>Humans own the why and the what. LLMs own the how.</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Party</th>
+<th>Owns</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Human</td>
+<td>Problem framing, scope, architecture, trade-offs, constraints, acceptance criteria, security posture, approval and accountability</td>
+</tr>
+<tr class="even">
+<td>LLM</td>
+<td>Implementation, infrastructure code, boilerplate, refactoring, test scaffolding, first-pass review, first-pass root-cause analysis, and diagnostic commands drafted from runbooks</td>
+</tr>
+<tr class="odd">
+<td>Shared</td>
+<td>Review. The LLM checks code against documentation. The human checks that documentation still describes what the business needs, and that the code meets it</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="human-roles">Human Roles</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Role</th>
+<th>Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Architect</td>
+<td>System shape, boundaries, ADRs, cross-cutting rules</td>
+</tr>
+<tr class="even">
+<td>Domain Owner</td>
+<td>Business rules and invariants for one domain</td>
+</tr>
+<tr class="odd">
+<td>Platform Owner</td>
+<td>Terraform modules, environments, infrastructure standards</td>
+</tr>
+<tr class="even">
+<td>Specifier</td>
+<td>Precise, testable requirements and acceptance criteria</td>
+</tr>
+<tr class="odd">
+<td>Reviewer</td>
+<td>Verifies code and infrastructure against documentation</td>
+</tr>
+<tr class="even">
+<td>Operator</td>
+<td>Environment guides, runbooks, incidents and feeding production learning back into documentation</td>
+</tr>
+</tbody>
+</table></div>
+<p>One person MAY hold several roles. Every responsibility MUST have a named owner.</p>
+<h3 id="accountability">Accountability</h3>
+<blockquote>
+<p>An LLM can write code. It cannot own a decision. Every merged change MUST have a human approver who can explain why it is correct.</p>
+</blockquote>
+
+<h2 id="section-05-principles"><span class="kicker">Section 05</span>Principles</h2>
+<p><strong>P1. Documentation Is the Source of Truth.</strong> If code and documentation disagree, documentation wins until a human decides otherwise.<br><em>In practice:</em> resolve every disagreement explicitly. Either fix the code, or update the documentation and record why.</p>
+<p><strong>P2. Change Starts in Documentation.</strong> Code without matching documentation is unowned.<br><em>In practice:</em> update the relevant document first, then generate or change code (Section 11).</p>
+<p><strong>P3. Record Decisions, Not Just Descriptions.</strong> The why outlives the what.<br><em>In practice:</em> any real choice between alternatives gets an ADR (Section 8).</p>
+<p><strong>P4. Every Rule Is Verifiable.</strong> A rule nobody can check is a wish.<br><em>In practice:</em> write concrete conditions, examples and acceptance criteria that a person can confirm.</p>
+<p><strong>P5. Structure Is Consistent.</strong> Humans and LLMs navigate by pattern.<br><em>In practice:</em> every domain, module and environment follows the same layout (Section 7).</p>
+<p><strong>P6. Every Bug Is Classified.</strong> The type of failure decides the fix.<br><em>In practice:</em> classify as Decision Wrong, Doc Missing, Code Diverged or Environment (Section 12).</p>
+<p><strong>P7. Archive, Do Not Delete.</strong> Superseded reasoning is still evidence.<br><em>In practice:</em> move replaced documents to <code>docs/archive/</code>, mark them superseded and link to their replacement.</p>
+<p><strong>P8. Humans Stay Accountable.</strong> LLM speed does not transfer responsibility.<br><em>In practice:</em> named human approval on every change, and a second reviewer for sensitive changes (Section 14).</p>
+<p><strong>P9. One Fact, One Place.</strong> Duplicated facts drift apart.<br><em>In practice:</em> each rule, value or decision lives in exactly one document. Others link to it (Section 10).</p>
+<p><strong>P10. Documentation Has Two Readers.</strong> Humans and LLMs both consume it.<br><em>In practice:</em> plain, precise language, defined terms, explicit constraints, examples over adjectives (Section 9).</p>
+<p><strong>P11. Prepare Before It Breaks.</strong> <em>We cannot see the future, but we can prepare for it.</em><br><em>In practice:</em> before a component goes live, document how it can fail, how the failure shows itself, and what to run first. Runbooks are written proactively, not after the first incident (Section 13).</p>
+
+<h2 id="section-06-the-documentation-set"><span class="kicker">Section 06</span>The Documentation Set</h2>
+<p>Every system SHOULD maintain the following documents. Small systems MAY merge them, but each type of content still needs a home.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Document</th>
+<th>Purpose</th>
+<th>Owner</th>
+<th>Update On</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Context</td>
+<td>Why the system exists, users, scope, key terms</td>
+<td>Product / Architect</td>
+<td>Scope changes</td>
+</tr>
+<tr class="even">
+<td>Architecture</td>
+<td>System shape, domains, boundaries, integrations, data flow</td>
+<td>Architect</td>
+<td>Structural changes</td>
+</tr>
+<tr class="odd">
+<td>Infrastructure Architecture</td>
+<td>Cloud topology, networking, environments, one section per capability</td>
+<td>Architect / Platform Owner</td>
+<td>Infrastructure changes</td>
+</tr>
+<tr class="even">
+<td>ADRs</td>
+<td>One record per significant decision</td>
+<td>Architect / Decision Maker</td>
+<td>Any real choice between alternatives</td>
+</tr>
+<tr class="odd">
+<td>Decision Register</td>
+<td>Open decisions, each with an owner and a due date, linked to its ADR once decided</td>
+<td>Architect</td>
+<td>When a question is raised or decided</td>
+</tr>
+<tr class="even">
+<td>Domain Rules</td>
+<td>Invariants, business rules, edge cases, acceptance criteria</td>
+<td>Domain Owner</td>
+<td>Any behaviour change</td>
+</tr>
+<tr class="odd">
+<td>Contracts</td>
+<td>The active API contract and data schemas, with no status or history (Section 9)</td>
+<td>Domain Owner</td>
+<td>Any interface change</td>
+</tr>
+<tr class="even">
+<td>Coding Standards</td>
+<td>Layering, naming, errors, logging, security conventions</td>
+<td>Architect</td>
+<td>Convention changes</td>
+</tr>
+<tr class="odd">
+<td>Infrastructure Standards</td>
+<td>Terraform conventions, module design, tagging, naming</td>
+<td>Platform Owner</td>
+<td>Convention changes</td>
+</tr>
+<tr class="even">
+<td>Testing Expectations</td>
+<td>What "done" means per domain and per module</td>
+<td>Domain Owner / Tester</td>
+<td>New rules, domains or modules</td>
+</tr>
+<tr class="odd">
+<td>Security</td>
+<td>Identity, authorisation, secrets handling, data classification</td>
+<td>Security Owner</td>
+<td>Any security-relevant change</td>
+</tr>
+<tr class="even">
+<td>Operations Standard</td>
+<td>What must be true in operation: severity levels, on-call, change windows. Links to runbooks for procedures</td>
+<td>Operator</td>
+<td>Process changes</td>
+</tr>
+<tr class="odd">
+<td>Environment Guides</td>
+<td>One per environment: accounts, regions, profiles, contexts, resource names</td>
+<td>Operator / Platform Owner</td>
+<td>Any environment change</td>
+</tr>
+<tr class="even">
+<td>Runbook</td>
+<td>Known failure modes, procedures, diagnostic commands</td>
+<td>Operator</td>
+<td>Before go-live, after incidents and near misses</td>
+</tr>
+<tr class="odd">
+<td>Operations Evidence</td>
+<td>Test runs, validation output, screenshots and other proof, dated and linked from where they are cited</td>
+<td>Operator / Tester</td>
+<td>When evidence is produced</td>
+</tr>
+<tr class="even">
+<td>Changelog</td>
+<td>What changed, when, and which documents it touched</td>
+<td>Everyone</td>
+<td>Every change</td>
+</tr>
+</tbody>
+</table></div>
+<p>The Operations Standard says <strong>what</strong> must happen. The Runbook says <strong>how</strong>. Environment Guides hold the <strong>facts</strong> both depend on.</p>
+
+<h2 id="section-07-repository-layout"><span class="kicker">Section 07</span>Repository Layout</h2>
+<p>Documentation lives in the same repository as code and infrastructure, is versioned with it, and changes in the same commit. It is organised by audience, so each reader finds their material in one place.</p>
+<pre class="text"><code>.
+├── docs/
+│   ├── README.md
+│   ├── CHANGELOG.md
+│   ├── context/
+│   │   ├── overview.md
+│   │   └── glossary.md
+│   ├── architecture/
+│   │   ├── architecture.md
+│   │   ├── infrastructure.md
+│   │   ├── security.md
+│   │   ├── decision-register.md
+│   │   └── decision-records/
+│   │       └── ADR-001-&lt;title&gt;.md
+│   ├── domains/
+│   │   └── &lt;domain&gt;/
+│   │       ├── rules.md
+│   │       └── acceptance.md
+│   ├── api/
+│   │   ├── specification.md
+│   │   └── openapi.yaml
+│   ├── database/
+│   │   └── conventions.md
+│   ├── standards/
+│   │   ├── coding.md
+│   │   ├── infrastructure.md
+│   │   └── testing.md
+│   ├── operations/
+│   │   ├── operations-standard.md
+│   │   ├── runbook.md
+│   │   ├── environments/
+│   │   │   └── &lt;environment&gt;.md
+│   │   ├── evidence/
+│   │   └── incidents/
+│   └── archive/
+├── infrastructure/
+│   ├── terraform/
+│   │   ├── environments/
+│   │   │   └── &lt;environment&gt;/
+│   │   │       └── README.md
+│   │   └── modules/
+│   │       └── &lt;module&gt;/
+│   │           └── README.md
+│   └── docker/
+│       ├── backend.Dockerfile
+│       └── frontend.Dockerfile
+└── src/
+    └── &lt;domain&gt;/
+        ├── api/
+        ├── application/
+        ├── domain/
+        └── infrastructure/</code></pre>
+<p>Typical environments are <code>dev</code>, <code>sandbox</code>, <code>sit</code>, <code>staging</code> and <code>production</code>. Typical modules include <code>network</code>, <code>eks</code>, <code>eks-addons</code>, <code>rds</code>, <code>alb</code>, <code>nlb</code>, <code>api-gateway</code>, <code>waf</code>, <code>kms</code>, <code>secrets</code>, <code>ecr</code>, <code>cloudwatch</code>, <code>s3-audit</code> and <code>gitlab-ci-iam</code>. The set varies by system; the structure does not.</p>
+<h3 id="code-layering">Code Layering</h3>
+<p>Every domain under <code>src/</code> uses the same four layers:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Layer</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>api/</code></td>
+<td>Controllers, DTOs</td>
+</tr>
+<tr class="even">
+<td><code>application/</code></td>
+<td>Use cases</td>
+</tr>
+<tr class="odd">
+<td><code>domain/</code></td>
+<td>Entities, rules</td>
+</tr>
+<tr class="even">
+<td><code>infrastructure/</code></td>
+<td>Repositories, adapters</td>
+</tr>
+</tbody>
+</table></div>
+<p>Domains MUST NOT reach into another domain's <code>domain/</code> or <code>infrastructure/</code> layers. Where they must interact, they use a published interface or event.</p>
+<h3 id="infrastructure-structure-rules">Infrastructure Structure Rules</h3>
+<ul>
+<li><code>infrastructure/terraform/environments/&lt;environment&gt;/</code> MUST contain only environment-specific composition, configuration and variable values.</li>
+<li>Shared infrastructure logic MUST be implemented in <code>infrastructure/terraform/modules/</code>.</li>
+<li>Environment directories MUST consume reusable modules and MUST NOT duplicate module implementation. Environments differ by variable, not by copied code.</li>
+<li>Each module and each environment directory SHOULD contain a <code>README.md</code>. A module README describes purpose, inputs, outputs and dependencies. An environment README lists the modules it instantiates.</li>
+<li>Docker build definitions MUST be stored in <code>infrastructure/docker/</code>.</li>
+<li>Operational procedures MUST be documented in the runbook, not left as undocumented manual steps beside Terraform files.</li>
+<li>Infrastructure decisions that need an ADR are defined in Section 8.</li>
+</ul>
+<h3 id="code-mirrors-documentation">Code Mirrors Documentation</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Documentation</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>docs/domains/&lt;domain&gt;/</code></td>
+<td><code>src/&lt;domain&gt;/</code></td>
+</tr>
+<tr class="even">
+<td>Capability section in <code>docs/architecture/infrastructure.md</code></td>
+<td><code>infrastructure/terraform/modules/&lt;module&gt;/</code></td>
+</tr>
+<tr class="odd">
+<td><code>docs/operations/environments/&lt;environment&gt;.md</code></td>
+<td><code>infrastructure/terraform/environments/&lt;environment&gt;/</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>A reader, human or LLM, MUST be able to move from documentation to implementation without relying on tribal knowledge.</p>
+
+<h2 id="section-08-adr-standard"><span class="kicker">Section 08</span>ADR Standard</h2>
+<p>Architecture Decision Records (ADRs) make reasoning recoverable, not just outcomes. They are the backbone of this standard.</p>
+<h3 id="when-an-adr-is-required">When an ADR Is Required</h3>
+<ul>
+<li>Any real choice between alternatives in application design.</li>
+<li>Any infrastructure change that affects architecture, security, availability, cost, networking or operational ownership.</li>
+</ul>
+<h3 id="required-sections">Required Sections</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Section</th>
+<th>Contains</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Status</td>
+<td>Proposed, Accepted, Superseded by ADR-XXX, or Deprecated</td>
+</tr>
+<tr class="even">
+<td>Context</td>
+<td>Problem, constraints, risks</td>
+</tr>
+<tr class="odd">
+<td>Decision</td>
+<td>What was decided, in one or two sentences</td>
+</tr>
+<tr class="even">
+<td>Alternatives</td>
+<td>Options considered and why each was rejected</td>
+</tr>
+<tr class="odd">
+<td>Consequences</td>
+<td>What gets easier, what gets harder</td>
+</tr>
+<tr class="even">
+<td>Rules</td>
+<td>Concrete MUST / MUST NOT rules the implementation follows</td>
+</tr>
+<tr class="odd">
+<td>Review Trigger</td>
+<td>Conditions under which the decision is reopened</td>
+</tr>
+<tr class="even">
+<td>References</td>
+<td>Hyperlinks to affected documents, modules, environments and tests</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="adr-rules">ADR Rules</h3>
+<ul>
+<li>ADRs are numbered sequentially. Numbers are never reused or renumbered. A skipped number is recorded, not filled.</li>
+<li>Accepted ADRs MUST NOT be substantively modified. A changed decision gets a new ADR, and the old ADR's status is updated to point to it.</li>
+<li>References MUST use repository-relative links to modules, classes or files, never line numbers (Section 10).</li>
+<li>Infrastructure ADRs MUST link to the affected Terraform modules and environments.</li>
+<li>An ADR SHOULD fit on a few phone screens. If it is longer, it probably holds more than one decision.</li>
+</ul>
+<h3 id="open-decisions">Open Decisions</h3>
+<p>A question that has not been decided yet goes in the decision register (<code>docs/architecture/decision-register.md</code>) with an owner and a due date, not in the documents it affects. When it is decided, the entry links to the new ADR and is closed.</p>
+<blockquote>
+<p><strong>Why the review trigger matters.</strong> It makes a decision conditional rather than permanent. Before proposing a change that contradicts an ADR, a human or LLM checks whether its trigger has fired.</p>
+</blockquote>
+
+<h2 id="section-09-writing-for-humans-and-llms"><span class="kicker">Section 09</span>Writing for Humans and LLMs</h2>
+<p>Documentation has two readers. What helps an LLM generate correct code also helps a human understand the system. The standard for both is precision.</p>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use <strong>MUST</strong>, <strong>SHOULD</strong> and <strong>MAY</strong> so the strength of each rule is unambiguous.</li>
+<li>Give every rule a <strong>Rule ID</strong> (for example <code>ALLOC-003</code>) so code, tests and bug reports can refer to it.</li>
+<li>Define terms once in the glossary and use them consistently. One concept, one word.</li>
+<li>Prefer <strong>examples</strong> over adjectives. Show a valid and an invalid input rather than saying "well-formed".</li>
+<li>State <strong>negative rules</strong> explicitly. What MUST NOT happen often matters more than what should.</li>
+<li>Include <strong>edge cases</strong>: empty, duplicate, concurrent, expired, unauthorised.</li>
+<li>Write <strong>exact names</strong> in environment guides and runbooks: resources, regions, profiles, contexts.</li>
+<li>Use repository-relative links for every reference to another document or artifact.</li>
+<li>Keep sentences short, one idea each.</li>
+</ul>
+<h3 id="avoid">Avoid</h3>
+<ul>
+<li>Vague words such as fast, secure, appropriate and as needed. Replace them with numbers or conditions.</li>
+<li>Restating a rule in several places (P9).</li>
+<li>Implementation detail the LLM should decide, unless it is a genuine constraint.</li>
+<li>Narrative history, status or progress in active documents. See Active Documentation Describes the Current Contract, below.</li>
+<li>Local file-system paths or line numbers.</li>
+</ul>
+<h3 id="example">Example</h3>
+<p><strong>Weak</strong></p>
+<pre class="text"><code>Allocation should handle duplicates properly.</code></pre>
+<p><strong>Strong</strong></p>
+<pre class="text"><code>ALLOC-003:
+A repeated request with the same idempotency key
+MUST return the original result and MUST NOT
+create a new record.
+
+A repeated key with a different request body
+MUST be rejected with a conflict error.</code></pre>
+<h3 id="active-documentation-describes-the-current-contract">Active Documentation Describes the Current Contract</h3>
+<p>Once an API capability is implemented and accepted, its API documentation MUST describe the active contract. It MUST NOT contain implementation status, delivery history, transient test results or outstanding-work commentary.</p>
+<p>A reader, human or LLM, treats every sentence in a contract as a promise. Status and history read as promises that may no longer be true, and they go stale the moment the work moves on.</p>
+<p>Everything else has its own home:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Content</th>
+<th>Belongs In</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Historical changes</td>
+<td>Changelog (<code>docs/CHANGELOG.md</code>)</td>
+</tr>
+<tr class="even">
+<td>Evidence: test runs, validation output, screenshots</td>
+<td>Operations evidence (<code>docs/operations/evidence/</code>)</td>
+</tr>
+<tr class="odd">
+<td>Open decisions</td>
+<td>Decision register (<code>docs/architecture/decision-register.md</code>)</td>
+</tr>
+<tr class="even">
+<td>Delivery progress</td>
+<td>Delivery tracker, such as Jira</td>
+</tr>
+</tbody>
+</table></div>
+<p>The API documentation MAY link to these. It MUST NOT restate them (P9).</p>
+<p>Signs that a sentence does not belong in an accepted contract: "currently", "not yet", "TODO", "in progress", "will be added", "as of", "was changed", "passed on", sprint names and ticket numbers.</p>
+<p><strong>Weak</strong></p>
+<pre class="text"><code>POST /api/v1/orders
+Implemented in Sprint 14.
+Idempotency added after QA found
+duplicate orders.
+Tested 3 Nov: 47 of 47 passing.
+TODO: rate limiting still outstanding.</code></pre>
+<p><strong>Strong</strong></p>
+<pre class="text"><code>POST /api/v1/orders
+Requires the Idempotency-Key header.
+
+A repeated key with the same body
+MUST return the original 201 response.
+
+A repeated key with a different body
+MUST return 409 Conflict.</code></pre>
+<p>The sprint goes to the delivery tracker, the QA finding to the changelog, the test run to operations evidence, and rate limiting to the decision register until someone decides it.</p>
+
+<h2 id="section-10-hyperlinking-and-traceability"><span class="kicker">Section 10</span>Hyperlinking and Traceability</h2>
+<h3 id="hyperlinking">Hyperlinking</h3>
+<p><strong>Hyperlinking</strong> is embedding a clickable link in a document that takes the reader directly to another document, section or implementation artifact. It is how this standard applies P9: facts live in one place, and everything else links to them.</p>
+<h3 id="hyperlinking-rules">Hyperlinking Rules</h3>
+<ul>
+<li>Documentation MUST use repository-relative Markdown links for content in the same repository.</li>
+<li>Link text MUST describe the destination. Generic text such as "click here", "this document" or "more information" MUST NOT be used.</li>
+<li>ADRs MUST link to the affected architecture documents, modules and environments.</li>
+<li>Module READMEs SHOULD link back to the ADRs, standards and architecture sections that govern them.</li>
+<li>Environment READMEs SHOULD link to the modules they instantiate and to their environment guide.</li>
+<li>The Operations Standard SHOULD link to the runbook for procedures, commands and troubleshooting.</li>
+<li>Links MUST be updated in the same change when files or directories move.</li>
+<li>A broken link is a documentation defect.</li>
+</ul>
+<h3 id="format">Format</h3>
+<pre class="md"><code>[Descriptive link text](relative/path/to/file.md#section)</code></pre>
+<p>Paths are relative to the file that contains the link. Count the <code>../</code> steps from that file.</p>
+<h3 id="examples">Examples</h3>
+<p>From an ADR in <code>docs/architecture/decision-records/</code> to a module:</p>
+<pre class="md"><code>Implemented by the
+[Network Terraform Module](../../../infrastructure/terraform/modules/network/README.md).</code></pre>
+<p>From <code>docs/architecture/infrastructure.md</code> to an environment:</p>
+<pre class="md"><code>See the
+[Sandbox Environment Configuration](../../infrastructure/terraform/environments/sandbox/README.md).</code></pre>
+<p>From <code>docs/operations/operations-standard.md</code> to a runbook section:</p>
+<pre class="md"><code>See [Database Capacity Response](runbook.md#database-capacity-response).</code></pre>
+<h3 id="capability-sections">Capability Sections</h3>
+<p>Each infrastructure capability SHOULD have a section in <code>docs/architecture/infrastructure.md</code> that links to everything about it. For example:</p>
+<pre class="md"><code>## Network
+
+- [Decision Record](decision-records/ADR-012-network-design.md)
+- [Terraform Module](../../infrastructure/terraform/modules/network/README.md)
+- [Dev Environment](../../infrastructure/terraform/environments/dev/README.md)
+- [SIT Environment](../../infrastructure/terraform/environments/sit/README.md)
+- [Production Environment](../../infrastructure/terraform/environments/production/README.md)
+- [Operations Standard](../operations/operations-standard.md)
+- [Runbook: Network Operations](../operations/runbook.md#network-operations)</code></pre>
+<h3 id="traceability-chain">Traceability Chain</h3>
+<p>Traceability means any rule can be followed to the implementation and test that honour it, and any implementation can be followed back to the rule it serves. Links SHOULD let a reader walk this chain:</p>
+<pre class="text"><code>Decision or Rule (ADR, domain rules)
+        ↓
+Architecture Documentation
+        ↓
+Implementation (domain module or Terraform module)
+        ↓
+Environment Configuration (infrastructure only)
+        ↓
+Test or Validation
+        ↓
+Operations Standard and Runbook</code></pre>
+<h3 id="maintaining-it-without-automation">Maintaining It Without Automation</h3>
+<ul>
+<li>Rule IDs appear in test names or descriptions.</li>
+<li>Each domain's <code>rules.md</code> lists its Rule IDs and the module that owns each.</li>
+<li>Code comments cite a Rule ID only where the reason is not obvious. They never restate the rule.</li>
+<li>Reviewers check that new or changed rules have a matching test, and that removed rules have their tests removed.</li>
+</ul>
+<p>The purpose is navigation, not a separate mapping register. Link to the authoritative artifact wherever practical.</p>
+<blockquote>
+<p><strong>The test is the executable form of the documentation.</strong> Where a rule matters, a test is the only way to confirm that a regenerated implementation still honours it.</p>
+</blockquote>
+
+<h2 id="section-11-the-change-lifecycle"><span class="kicker">Section 11</span>The Change Lifecycle</h2>
+<p>Every change, from a new feature to a one-line fix or a Terraform variable, follows the same five steps. Small changes move through them quickly. The order does not change.</p>
+<ol type="1">
+<li><strong>Define.</strong> A human writes or updates the requirement, rule or acceptance criteria.</li>
+<li><strong>Decide.</strong> If the change involves a real choice, a human records it in an ADR or confirms an existing ADR still holds.</li>
+<li><strong>Generate.</strong> The LLM implements the change using the documentation as context and following the standards.</li>
+<li><strong>Verify.</strong> Tests and validation run. The LLM checks the change against the documentation. A human reviews it (Section 14).</li>
+<li><strong>Reconcile.</strong> Any gap found is fixed in the documentation or the implementation. Links and the changelog are updated, and the change is merged.</li>
+</ol>
+<h3 id="the-rule">The Rule</h3>
+<blockquote>
+<p>Every code or infrastructure change MUST include a documentation update, or an explicit statement: <em>No doc impact, because...</em> The reason is what keeps the statement honest.</p>
+</blockquote>
+<p>When a change moves files, adds or removes environments or modules, or changes controls or ownership, the affected links MUST be updated in the same change.</p>
+<h3 id="when-code-leads">When Code Leads</h3>
+<p>During an incident or an experiment, code MAY change first. The change is not complete until the documentation is reconciled. Record the reconciliation as a follow-up with an owner, not as a memory.</p>
+
+<h2 id="section-12-bugs-and-root-cause"><span class="kicker">Section 12</span>Bugs and Root Cause</h2>
+<p>In a doc-first system, documentation is the reference point for diagnosis. The first question is not "what broke?" but "which layer is wrong?"</p>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Meaning</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Decision Wrong</td>
+<td>Documentation followed correctly, but the decision was wrong</td>
+<td>New superseding ADR, then documentation and code</td>
+</tr>
+<tr class="even">
+<td>Doc Missing</td>
+<td>The situation was never specified, so the LLM guessed</td>
+<td>Add the rule and edge case, then fix the code</td>
+</tr>
+<tr class="odd">
+<td>Code Diverged</td>
+<td>Documentation correct, implementation does not follow it</td>
+<td>Fix the implementation; add the missing test</td>
+</tr>
+<tr class="even">
+<td>Environment</td>
+<td>Configuration, data, infrastructure or a dependency</td>
+<td>Fix the environment or module; update the environment guide and runbook</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="root-cause-protocol">Root-Cause Protocol</h3>
+<ol type="1">
+<li><strong>Reproduce</strong> the bug and gather evidence: logs, traces, request IDs, data state.</li>
+<li><strong>Ground</strong> the LLM with the relevant documentation and evidence. Ask which rules apply and whether the observed behaviour violates them.</li>
+<li><strong>Classify</strong> using the table above. A human confirms the classification.</li>
+<li><strong>Fix</strong> at the correct layer: decision, documentation, implementation or environment.</li>
+<li><strong>Prevent</strong> recurrence by adding the test or validation that would have caught it.</li>
+<li><strong>Update</strong> affected documentation and links.</li>
+<li><strong>Record</strong> incidents and near misses in <code>docs/operations/incidents/</code> with the classification.</li>
+</ol>
+<blockquote class="warn">
+<p><strong>Limit.</strong> Documentation describes intended behaviour. It cannot show runtime state, concurrency, data quality or infrastructure faults. Evidence from the running system is always required.</p>
+</blockquote>
+
+<h2 id="section-13-runbooks-and-proactive-operations"><span class="kicker">Section 13</span>Runbooks and Proactive Operations</h2>
+<blockquote class="motto"><p>We cannot see the future,<br>but we can prepare for it.</p></blockquote>
+<p>Infrastructure and incident work is where doc-first pays off fastest. The runbook and environment guides do two jobs:</p>
+<ul>
+<li><strong>Before an incident</strong>, they hold the failure modes and diagnostic commands, written in advance.</li>
+<li><strong>During an incident</strong>, they are the LLM's source of truth. The LLM turns them into exact, ready-to-run commands.</li>
+</ul>
+<blockquote>
+<p><strong>The shift.</strong> The human no longer types or looks up commands. The human describes the symptom, supplies the documentation, decides what to run and judges the results. The LLM supplies the full command with the correct profile, region, context and resource names, taken from the documentation.</p>
+</blockquote>
+<h3 id="example-1">Example</h3>
+<p>An admin console in SIT is returning errors. The engineer gives the LLM the SIT environment guide, the runbook and the symptom. The LLM proposes read-only checks using names from the guide (names here are illustrative):</p>
+<pre class="bash"><code># 1. Is the application running?
+kubectl --context sit -n app get pods
+
+kubectl --context sit -n app \
+  logs deploy/app-api --since=30m \
+  | grep -i error
+
+# 2. Is the database healthy?
+aws rds describe-db-instances \
+  --profile app-sit \
+  --region &lt;region-from-guide&gt; \
+  --db-instance-identifier app-sit \
+  --query \
+  &#39;DBInstances[0].DBInstanceStatus&#39;
+
+# 3. Did the secrets sync?
+kubectl --context sit -n app \
+  get externalsecrets</code></pre>
+<p>The engineer runs them and pastes the output back. The LLM narrows the cause against the runbook's known failure modes, for example a database credential rotated upstream but not yet synced.</p>
+<h3 id="investigation-loop">Investigation Loop</h3>
+<ol type="1">
+<li><strong>Describe.</strong> The human states the symptom, environment and time window.</li>
+<li><strong>Ground.</strong> The human supplies the runbook, environment guide and relevant ADRs.</li>
+<li><strong>Propose.</strong> The LLM suggests read-only commands, each with a one-line reason.</li>
+<li><strong>Run.</strong> The human executes them and returns the output.</li>
+<li><strong>Narrow.</strong> The LLM compares evidence with documented behaviour and known failure modes, then proposes the next step.</li>
+<li><strong>Decide.</strong> The human chooses the fix. Any change to an environment is the human's decision.</li>
+<li><strong>Record.</strong> The runbook is updated with any new failure mode and the commands that found it.</li>
+</ol>
+<h3 id="environment-guide-requirements">Environment Guide Requirements</h3>
+<p>An LLM can only produce exact commands if the documentation contains exact facts. Each environment guide MUST include (template in Appendix F):</p>
+<ul>
+<li>Account, region, CLI profile, cluster context and namespaces.</li>
+<li>Resource names: databases, deployments, log groups, load balancers, queues.</li>
+<li>Secret <strong>names and locations, never values</strong>, and how each syncs.</li>
+<li>Dependencies: what calls what, so the LLM knows where to look next.</li>
+<li>Links to the environment's Terraform directory and the runbook.</li>
+<li>Which operations are safe (read-only) and which change state.</li>
+</ul>
+<h3 id="proactive-by-design">Proactive by Design</h3>
+<p>Every component, module and integration SHOULD answer three questions <strong>before</strong> it goes live:</p>
+<ol type="1">
+<li><strong>How can this fail?</strong> Outages, expired credentials, full disks, exhausted connections, bad deployments, upstream changes, quota limits.</li>
+<li><strong>How will we know?</strong> The symptom, alarm, log line or user report.</li>
+<li><strong>What do we run first?</strong> The read-only commands that confirm or rule out the cause, and the documented fix.</li>
+</ol>
+<p>The answers go into the runbook as failure mode entries (template in Appendix E).</p>
+<h3 id="using-the-llm-to-prepare">Using the LLM to Prepare</h3>
+<ul>
+<li><strong>Pre-mortem.</strong> Give the LLM the architecture documentation and ADRs and ask how each component could fail. The human keeps the realistic failure modes and discards the rest.</li>
+<li><strong>Prepared commands.</strong> For each failure mode, the LLM drafts diagnostic commands from the environment guide. A human checks them in a non-production environment.</li>
+<li><strong>New decisions, new failure modes.</strong> Every new ADR, module or component adds its failure modes in the same change, not after the first incident.</li>
+<li><strong>Drills.</strong> Periodically walk through a failure mode in SIT or sandbox with the runbook and the LLM, to confirm the commands and names are still correct.</li>
+</ul>
+<p><strong>Near misses count.</strong> Anything that almost failed, or failed quietly, is recorded the same way as an incident. Preparing for the next failure is cheaper than investigating it.</p>
+<blockquote>
+<p><strong>Reactive:</strong> something breaks, then people work out what to run.<br><strong>Proactive:</strong> something breaks, and the runbook already says what to run.</p>
+</blockquote>
+<h3 id="safety-rules">Safety Rules</h3>
+<ul>
+<li><strong>Read before write.</strong> Investigation starts with read-only commands: describe, get, logs, list.</li>
+<li><strong>Label mutating commands.</strong> Anything that restarts, scales, deletes, rotates or modifies MUST be marked as a change and explained before it runs.</li>
+<li><strong>Humans execute.</strong> The LLM proposes. It MUST NOT run commands against shared environments.</li>
+<li><strong>Explicit context.</strong> Every command MUST name its profile, region and cluster context. Never rely on whatever the shell happens to point at.</li>
+<li><strong>No invented names.</strong> If a resource name is not in the documentation, the LLM MUST ask rather than guess. A guessed name that happens to exist is worse than one that fails.</li>
+<li><strong>No secrets in the conversation.</strong> Redact credentials, tokens and personal data before sharing output.</li>
+<li><strong>Production is stricter.</strong> Production changes follow the change process (Section 11), not the investigation loop.</li>
+</ul>
+
+<h2 id="section-14-review-standard"><span class="kicker">Section 14</span>Review Standard</h2>
+<p>Generated code and infrastructure are reviewed as if written by a capable, fast colleague who has never met your users: usually correct, occasionally confidently wrong.</p>
+<h3 id="every-reviewer-checks">Every Reviewer Checks</h3>
+<ul>
+<li><strong>Intent.</strong> Does the change do what the updated documentation says, and only that?</li>
+<li><strong>Documentation.</strong> Is it updated, or is "no doc impact" justified?</li>
+<li><strong>Rules.</strong> Are affected Rule IDs covered by tests or validation?</li>
+<li><strong>Boundaries.</strong> Does code stay within its domain and layer? Does infrastructure stay within its module?</li>
+<li><strong>Standards.</strong> Naming, error handling, logging, Terraform conventions.</li>
+<li><strong>Traceability.</strong> Are links present, correct and updated?</li>
+<li><strong>Environment impact.</strong> Which environments change, and is the change confined to variables where it should be?</li>
+<li><strong>Active contract.</strong> Accepted API documentation holds no status, history, test results or outstanding work.</li>
+<li><strong>Surprises.</strong> New dependencies, files outside the expected layout, or anything nobody asked for.</li>
+</ul>
+<h3 id="second-human-review">Second Human Review</h3>
+<p>Changes in these areas SHOULD have a second human reviewer:</p>
+<ul>
+<li><strong>Security:</strong> authentication, authorisation, secrets, IAM permissions, encryption.</li>
+<li><strong>Data:</strong> personal or regulated data, database migrations, anything irreversible.</li>
+<li><strong>Correctness:</strong> financial or identity logic, concurrency, transactions, idempotency.</li>
+<li><strong>Infrastructure:</strong> networking, public exposure, production infrastructure.</li>
+</ul>
+
+<h2 id="section-15-the-human-skill-shift"><span class="kicker">Section 15</span>The Human Skill Shift</h2>
+<p>When writing code becomes cheap, the scarce skills are the ones that decide what code should exist and whether it is right.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Declining in Value</th>
+<th>Rising in Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Syntax recall</td>
+<td>Precise technical writing</td>
+</tr>
+<tr class="even">
+<td>Framework trivia</td>
+<td>Systems and architecture thinking</td>
+</tr>
+<tr class="odd">
+<td>Typing speed</td>
+<td>Domain knowledge</td>
+</tr>
+<tr class="even">
+<td>Boilerplate</td>
+<td>Edge-case specification</td>
+</tr>
+<tr class="odd">
+<td>Solo implementation</td>
+<td>Sceptical review and verification</td>
+</tr>
+<tr class="even">
+<td>Memorised commands</td>
+<td>Operational judgment and diagnosis</td>
+</tr>
+<tr class="odd">
+<td>Security mechanics</td>
+<td>Security and risk judgment</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="what-this-means-for-engineers">What This Means for Engineers</h3>
+<ul>
+<li>Reading code remains essential. You cannot review what you cannot read.</li>
+<li>Writing becomes an engineering skill, not an afterthought.</li>
+<li>Junior engineers need deliberate practice in fundamentals, because the LLM removes the repetition that used to teach them.</li>
+<li>Seniority is measured by the quality of decisions and specifications, not lines produced.</li>
+</ul>
+<blockquote>
+<p>The strongest engineers specify precisely and review sceptically.</p>
+</blockquote>
+
+<h2 id="section-16-risks-and-limits"><span class="kicker">Section 16</span>Risks and Limits</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr class="header">
+<th>Risk</th>
+<th>What Happens</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Non-determinism</td>
+<td>The same documentation produces different code</td>
+<td>Tests as the executable contract; human review</td>
+</tr>
+<tr class="even">
+<td>Over-trust</td>
+<td>Plausible code is accepted without real review</td>
+<td>Review standard; named accountability</td>
+</tr>
+<tr class="odd">
+<td>Documentation drift</td>
+<td>Code changes while documentation lags</td>
+<td>The change rule; reconcile step; reviewers check documents and links</td>
+</tr>
+<tr class="even">
+<td>Documentation bloat</td>
+<td>Documents grow until nobody reads them</td>
+<td>One fact, one place; archive; short ADRs</td>
+</tr>
+<tr class="odd">
+<td>Underspecification</td>
+<td>The LLM silently fills gaps with guesses</td>
+<td>Edge cases in rules; Doc Missing bug class</td>
+</tr>
+<tr class="even">
+<td>Security blind spots</td>
+<td>Generated code introduces subtle vulnerabilities</td>
+<td>Second human review</td>
+</tr>
+<tr class="odd">
+<td>Skill atrophy</td>
+<td>Engineers lose the ability to reason about code</td>
+<td>Deliberate practice; rotating deep reviews</td>
+</tr>
+<tr class="even">
+<td>Context limits</td>
+<td>The LLM cannot hold the whole documentation set</td>
+<td>Consistent structure; focused per-domain documents</td>
+</tr>
+<tr class="odd">
+<td>Reactive runbooks</td>
+<td>The first failure is always slow</td>
+<td>Pre-mortems; failure modes documented before go-live</td>
+</tr>
+<tr class="even">
+<td>Wrong-environment commands</td>
+<td>A correct command runs against the wrong account or cluster</td>
+<td>Explicit profile, region and context; read before write</td>
+</tr>
+<tr class="odd">
+<td>Environment drift</td>
+<td>Environments diverge from each other</td>
+<td>Reusable modules; environments differ by variable only</td>
+</tr>
+<tr class="even">
+<td>Module duplication</td>
+<td>Infrastructure logic is copied into environments</td>
+<td>Platform Owner owns modules; review boundary check</td>
+</tr>
+</tbody>
+</table></div>
+
+<h2 id="section-17-adoption-levels"><span class="kicker">Section 17</span>Adoption Levels</h2>
+<p>Teams adopt this standard in stages. Each level builds on the previous one.</p>
+<p><strong>Level 1: Documented.</strong> Context, architecture and standards exist in the repository.</p>
+<p><strong>Level 2: Decided.</strong> Significant decisions have ADRs in one format, with review triggers.</p>
+<p><strong>Level 3: Doc-Led.</strong> Every change updates documentation or states "no doc impact". Rules have IDs. Documents link to each other.</p>
+<p><strong>Level 4: Traceable.</strong> Rules link to code, modules, environments and tests. Bugs are classified. Runbooks drive investigations, and incidents feed back into documentation.</p>
+<p><strong>Level 5: Source of Truth.</strong> Failure modes are documented before go-live. Documentation is complete enough that any domain or module could be regenerated from it and verified by its tests.</p>
+<blockquote>
+<p><strong>Where to start.</strong> Most teams reach Level 3 quickly: consistent ADRs, audience-based documents and a documentation update on every change. The usual next step is Rule IDs linked to tests.</p>
+</blockquote>
+
+<h2 id="section-18-glossary"><span class="kicker">Section 18</span>Glossary</h2>
+<p><strong>ADR.</strong> Architecture Decision Record: a short document recording one decision, its alternatives and consequences.</p>
+<p><strong>Acceptance Criteria.</strong> Conditions a change must meet to be considered done.</p>
+<p><strong>Active Contract.</strong> What an accepted API promises today: endpoints, inputs, outputs, errors and rules. Nothing about how or when it was built.</p>
+<p><strong>Decision Register.</strong> The list of open decisions, each with an owner and a due date. A decided entry links to its ADR.</p>
+<p><strong>Doc-First.</strong> Documentation is updated before or with code, and is the source of truth.</p>
+<p><strong>Drift.</strong> Documentation and implementation no longer describe the same behaviour.</p>
+<p><strong>Environment Composition.</strong> The Terraform configuration that selects and configures reusable modules for one environment.</p>
+<p><strong>Environment Guide.</strong> The document holding the exact facts of one environment: accounts, regions, contexts and resource names.</p>
+<p><strong>Failure Mode.</strong> A documented way a component can fail, with its symptom, likely cause, diagnostic commands and fix.</p>
+<p><strong>Hyperlinking.</strong> Embedding a clickable link that takes the reader to another document, section or artifact.</p>
+<p><strong>Invariant.</strong> A rule that must always hold, such as "audit events are never modified".</p>
+<p><strong>Near Miss.</strong> Something that almost failed, or failed without visible impact. Recorded like an incident.</p>
+<p><strong>Operations Evidence.</strong> Dated proof such as test runs, validation output and screenshots, kept under <code>docs/operations/evidence/</code>.</p>
+<p><strong>Pre-mortem.</strong> Asking, before go-live, how a component could fail, so the runbook is ready in advance.</p>
+<p><strong>Review Trigger.</strong> A condition that, when met, means an ADR should be reconsidered.</p>
+<p><strong>Rule ID.</strong> A stable identifier for one rule, used in code, tests and bug reports.</p>
+<p><strong>Runbook.</strong> The document holding failure modes, procedures and diagnostic commands.</p>
+<p><strong>Source of Truth.</strong> The artifact that wins when two artifacts disagree.</p>
+<p><strong>Traceability.</strong> Being able to follow a rule to its implementation, environment and test, and back.</p>
+
+<h2 id="appendix-a-adr-template"><span class="kicker">Appendix A</span>ADR Template</h2>
+<pre class="md"><code># ADR-NNN: &lt;decision title&gt;
+
+Status: Proposed | Accepted |
+        Superseded by ADR-XXX | Deprecated
+Date: YYYY-MM-DD
+Owner: &lt;name&gt;
+
+## Context
+&lt;problem, forces, constraints&gt;
+
+## Decision
+&lt;one or two sentences&gt;
+
+## Alternatives
+- &lt;option&gt;: rejected because &lt;why&gt;
+
+## Consequences
+- Easier: &lt;...&gt;
+- Harder: &lt;...&gt;
+
+## Rules
+- &lt;ID&gt;: &lt;MUST / MUST NOT rule&gt;
+
+## Review Trigger
+&lt;conditions to reopen&gt;
+
+## References
+- Documentation: &lt;Markdown links&gt;
+- Modules: &lt;Markdown links&gt;
+- Environments: &lt;Markdown links&gt;
+- Tests or validation: &lt;names&gt;</code></pre>
+
+<h2 id="appendix-b-domain-rules-template"><span class="kicker">Appendix B</span>Domain Rules Template</h2>
+<pre class="md"><code># &lt;Domain&gt; Rules
+
+## Responsibility
+&lt;what this domain owns and does not own&gt;
+
+## Invariants
+- &lt;ID&gt;: &lt;always true&gt;
+
+## Rules
+- &lt;ID&gt;: &lt;MUST / SHOULD rule&gt;
+  Valid:   &lt;example&gt;
+  Invalid: &lt;example&gt;
+
+## Edge Cases
+- Empty / Duplicate / Concurrent
+- Expired / Unauthorised
+
+## Acceptance Criteria
+- &lt;condition for done&gt;
+
+## Rule Ownership
+| Rule ID | Module | Test |
+
+## Owner
+&lt;name&gt;</code></pre>
+
+<h2 id="appendix-c-change-description-template"><span class="kicker">Appendix C</span>Change Description Template</h2>
+<pre class="md"><code>## Change
+&lt;what and why, one paragraph&gt;
+
+## Docs Updated
+- &lt;file&gt;: &lt;what changed&gt;
+  or: No doc impact, because &lt;...&gt;
+
+## Rules Affected
+- &lt;ID&gt;: added / changed / removed
+
+## Decision
+ADR-NNN still holds | New ADR-NNN
+
+## Environments Affected
+- &lt;environment&gt;: &lt;what changes&gt;
+
+## Links
+- Updated: Yes | Not applicable
+
+## Verification
+- Tests or validation: &lt;names&gt;
+- Reviewer: &lt;name&gt;
+- Second reviewer: &lt;name, if required&gt;</code></pre>
+
+<h2 id="appendix-d-bug-record-template"><span class="kicker">Appendix D</span>Bug Record Template</h2>
+<pre class="md"><code>## Bug
+&lt;symptom and evidence&gt;
+
+## Environment and Time Window
+&lt;environment, start and end time&gt;
+
+## Classification
+Decision Wrong | Doc Missing |
+Code Diverged | Environment
+
+## Rules Involved
+- &lt;ID&gt;
+
+## Commands Run
+&lt;read-only checks and results&gt;
+
+## Fix
+&lt;layer fixed and how&gt;
+
+## Test or Validation Added
+&lt;name&gt;
+
+## Documentation and Links Updated
+&lt;file and change, or not applicable&gt;
+
+## Runbook Updated
+&lt;failure mode added or changed&gt;</code></pre>
+
+<h2 id="appendix-e-failure-mode-entry-template"><span class="kicker">Appendix E</span>Failure Mode Entry Template</h2>
+<p>One entry per known failure mode, in <code>docs/operations/runbook.md</code>.</p>
+<pre class="md"><code>## &lt;Failure mode title&gt;
+
+Component: &lt;domain, module or service&gt;
+Environments: &lt;all, or list&gt;
+
+### Symptom
+&lt;what users, alarms or logs show&gt;
+
+### Likely Causes
+- &lt;cause&gt;
+
+### Diagnose (read-only)
+&lt;exact commands, with profile,
+ region and context&gt;
+
+### Fix
+&lt;steps; label every mutating
+ command as a change&gt;
+
+### Prevention
+&lt;test, alarm or design change&gt;
+
+### History
+- &lt;date&gt;: &lt;incident or near miss link&gt;</code></pre>
+
+<h2 id="appendix-f-environment-guide-template"><span class="kicker">Appendix F</span>Environment Guide Template</h2>
+<p>One per environment, in <code>docs/operations/environments/&lt;environment&gt;.md</code>.</p>
+<pre class="md"><code># &lt;Environment&gt; Environment Guide
+
+## Purpose
+&lt;what this environment is for&gt;
+
+## Access
+- Account: &lt;id or alias&gt;
+- Region: &lt;region&gt;
+- CLI profile: &lt;profile&gt;
+- Cluster context: &lt;context&gt;
+- Namespaces: &lt;list&gt;
+
+## Resources
+| Type | Name |
+| Database | &lt;identifier&gt; |
+| Deployment | &lt;name&gt; |
+| Log group | &lt;name&gt; |
+| Load balancer | &lt;name&gt; |
+
+## Secrets
+| Name | Location | Sync method |
+(names only, never values)
+
+## Dependencies
+&lt;what calls what&gt;
+
+## Safe and Unsafe Operations
+- Read-only: &lt;commands&gt;
+- Changes state: &lt;commands&gt;
+
+## Links
+- [Terraform Environment](&lt;relative path&gt;)
+- [Runbook](&lt;relative path&gt;)</code></pre>
+
+<p><em>End of standard. Version 1.2.</em></p>
+<p><em>Doc-First Engineering Standard by Olwethu Nguza, <a href="https://github.com/Oliesta/doc-first-engineering">https://github.com/Oliesta/doc-first-engineering</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</em></p>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <p>Doc-First Engineering Standard, Version 1.2, by Olwethu Nguza, Technical Lead (ex-FAANG).</p>
+    <p>The standard is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. The Claude skill is <a href="https://github.com/Oliesta/doc-first-engineering/blob/main/LICENSE">MIT</a>. Source on <a href="https://github.com/Oliesta/doc-first-engineering">GitHub</a>.</p>
+  </div>
+</footer>
+
+<script>
+  // Collapse the contents list on small screens so the standard is one tap away.
+  if (window.matchMedia("(max-width: 999px)").matches) {
+    var d = document.querySelector("nav.toc details"); if (d) d.removeAttribute("open");
+  }
+</script>
+</body>
+</html>

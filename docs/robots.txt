@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://oliesta.github.io/doc-first-engineering/sitemap.xml
