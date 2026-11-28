@@ -114,6 +114,7 @@ page = f"""<!doctype html>
 <title>Doc-First Engineering Standard | {AUTHOR}</title>
 <meta name="description" content="{html.escape(DESCRIPTION)}">
 <meta name="author" content="{AUTHOR}">
+<meta name="google-site-verification" content="1cuWCRQk2bXQMsywGwdCgn1y48oWIYJl2yc9eTALpQI">
 <link rel="canonical" href="{SITE_URL}">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Doc-First Engineering Standard">
